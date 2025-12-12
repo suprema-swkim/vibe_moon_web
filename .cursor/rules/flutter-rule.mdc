@@ -1,0 +1,174 @@
+---
+description: Flutter 및 Dart 개발 시 준수해야 할 코딩 규칙, 명명 규칙, 아키텍처 패턴, 테스트 전략 등을 정의한 종합 가이드라인
+globs: **/*.dart
+# alwaysApply: true
+---
+
+# Flutter를 위한 AI 규칙
+
+당신은 Flutter와 Dart 개발에 능숙한 전문가입니다. 목표는 아름답고, 성능이 뛰어나며, 유지보수가 쉬운 애플리케이션을 현대적인 모범 사례에 따라 구축하는 것입니다. 또한 데스크톱, 웹, 모바일 등 다양한 플랫폼에서 Flutter 애플리케이션을 작성하고 테스트하며 실행한 경험이 풍부합니다.
+
+## 상호작용 가이드라인
+
+* **사용자 수준:** 사용자는 프로그래밍 개념에 익숙하지만 Dart는 처음일 수 있다고 가정합니다.
+* **설명 방식:** 코드를 생성할 때 null safety, futures, streams 등 Dart-specific 개념을 함께 설명합니다.
+* **명확성:** 요청이 모호할 경우 기능 목적과 타깃 플랫폼(웹/모바일/CLI 등)을 질문합니다.
+* **의존성 안내:** 새로운 pub.dev 패키지를 추천할 때 왜 필요한지 설명합니다.
+* **포매팅:** 모든 코드는 \`dart format\` 스타일을 따릅니다.
+* **자동 수정:** \`dart fix\`를 활용해 일반적인 오류를 자동으로 개선할 수 있습니다.
+* **Lint 사용:** Dart linter의 권장 규칙을 사용합니다.
+
+## 프로젝트 구조
+
+* 표준 Flutter 프로젝트 구조를 가정하며, 진입점은 \`lib/main.dart\`입니다.
+* **상세 구조는 project-structure.mdc 참조**
+
+## Flutter 스타일 가이드
+
+* **SOLID 원칙 적용**
+* **간결하고 선언적인 코드 작성**
+* **Inheritance보다 Composition 선호**
+* **불변성(Immutability) 유지** — 특히 StatelessWidget
+* **상태 분리:** 일시적 상태와 앱 전역 상태를 명확히 구분합니다.
+* **UI는 위젯으로 구성:** 작은 위젯을 조합하여 복잡한 UI를 만듭니다.
+* **네비게이션:** \`go_router\` 또는 \`auto_route\`와 같은 현대적 라우팅 선호
+
+## 패키지 관리
+
+* \`flutter pub add\`로 의존성을 추가합니다.
+* Dev dependency는 \`flutter pub add dev:<패키지>\`
+* override는 필요한 경우에만 사용합니다.
+* 필요 없어진 패키지는 \`dart pub remove <package>\`로 제거합니다.
+
+## 코드 품질
+
+* **유지보수성 높은 구조** 사용
+* **명확한 네이밍** — 축약어 지양 (development-dictionary.mdc 참조)
+* **간결하고 읽기 쉬운 코드**
+* **함수는 짧고 단일 책임 유지**
+* **에러 핸들링 고려**
+* **80자 이하 줄 선호, 클래스는 PascalCase, 변수는 camelCase**
+
+## Dart 베스트 프랙티스
+
+* Effective Dart 권장사항 준수
+* 라이브러리 및 클래스는 기능별로 정리
+* 과한 주석은 지양, 필요한 경우 명확한 문서화
+* async/await 정확히 사용
+* sound null safety 준수 — \`!\`는 확실한 경우에만
+* 패턴 매칭 적극 활용
+* records로 간단한 다중 반환 구성
+* switch는 exhaustive하게 작성
+* 적절한 try-catch 사용
+* 단순 함수는 화살표 함수 사용
+
+## Flutter 베스트 프랙티스
+
+* const 생성자 적극 활용
+* build 메서드 크기를 작게 유지 — private 위젯 분리
+* 긴 리스트는 ListView.builder 사용
+* 빌드 과정에서 무거운 작업 금지
+* compute()로 CPU 연산 분리
+
+## API 설계 원칙
+
+* 사용자가 쉽게 사용할 수 있는 API 설계
+* 문서화 필수
+
+## 앱 아키텍처
+
+* MVC/MVVM 등 관심사 분리 적용
+* Presentation, Domain, Data, Core 계층 구조 유지
+* 대규모 프로젝트는 기능(Feature) 기반 폴더 구조 사용
+
+## Lint 규칙 예시
+
+\`\`\`yaml
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 프로젝트에 맞춰 규칙 추가 가능
+\`\`\`
+
+## 상태 관리
+
+* **Riverpod** 라이브러리 사용 (\`flutter_riverpod\` 패키지)
+* Provider 타입:
+  - \`Provider\`: 불변 값 제공
+  - \`StateProvider\`: 간단한 상태 관리
+  - \`StateNotifierProvider\`: 복잡한 상태 로직
+  - \`FutureProvider\`: 비동기 데이터 로드
+  - \`StreamProvider\`: 실시간 데이터 스트림
+* ConsumerWidget 또는 Consumer로 상태 구독
+* ref.watch()로 상태 읽기, ref.read()로 일회성 접근
+* 전역 상태와 지역 상태 명확히 구분
+* 의존성 주입(DI)은 Riverpod의 Provider로 해결
+
+## 데이터 흐름
+
+* MVVM 구조 준수  
+  - page <-> viewModel(Riverpod) <-> repository <-> REST API(Retrofit) 흐름을 따름
+* 데이터 소스 추상화를 위해 Repository 패턴 사용
+
+## 라우팅
+
+* go_router 우선 사용
+
+## 직렬화
+
+* \`json_serializable\` + \`json_annotation\` 조합 사용
+* 직렬화/역직렬화가 필요한 모델 클래스에 아래와 같이 어노테이션 활용
+  \`\`\`dart
+  import 'package:json_annotation/json_annotation.dart';
+
+  part 'your_model.g.dart';
+
+  @JsonSerializable()
+  class YourModel {
+    final String name;
+
+    YourModel({required this.name});
+
+    factory YourModel.fromJson(Map<String, dynamic> json) => _$YourModelFromJson(json);
+    Map<String, dynamic> toJson() => _$YourModelToJson(this);
+  }
+  \`\`\`
+* 코드 생성기로 \`.g.dart\` 파일을 생성하려면 아래 명령어 실행  
+  \`\`\`
+  dart run build_runner build --delete-conflicting-outputs
+  \`\`\`
+  을 수행하면 \`your_model.g.dart\`가 자동으로 생성됨
+
+## 로깅
+
+* **dart:developer의 log() 사용** — print() 사용 금지
+* 로그 레벨 구분: \`log('message', name: 'ComponentName', level: 800)\`
+* 에러 로그: \`log('error', error: e, stackTrace: st)\`
+
+## 코드 생성
+
+* build_runner로 코드 생성
+
+## 테스트
+
+* 단위 테스트, 위젯 테스트, 통합 테스트 모두 포함
+* mock/stub/fake 적절히 사용
+
+## 테마 & 스타일링
+
+* Material 3 + ThemeData 사용
+* ThemeExtension으로 확장 테마 구성
+* 반응형 UI 구성
+* 이미지 자원은 에러/로딩 처리 포함
+
+## Flutter Web 특화 사항
+
+* **플랫폼 감지**: \`kIsWeb\` 상수로 웹 환경 확인
+* **URL 전략**: \`setUrlStrategy(PathUrlStrategy())\` 사용 (#제거)
+* **웹 성능 최적화**:
+  - CanvasKit vs HTML 렌더러 선택 고려
+  - 이미지 최적화 (WebP 포맷 우선)
+  - 코드 스플리팅 활용
+* **브라우저 호환성**: Chrome, Safari, Firefox 최신 버전 지원
+* **반응형 디자인 필수**: 데스크톱, 태블릿, 모바일 모두 고려
