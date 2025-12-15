@@ -1,33 +1,29 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../app/theme/app_colors.dart';
-import '../app/theme/app_effects.dart';
-import '../app/theme/app_spacing.dart';
-import '../app/theme/app_typography.dart';
+import 'package:vibe_moon_web/app/theme/theme.dart';
 
-/// 글래스모피즘 텍스트 입력 필드
 class GlassTextField extends StatefulWidget {
-  final String? label;
-  final String? hint;
-  final TextEditingController? controller;
+  final TextEditingController controller;
+  final String hintText;
+  final String? errorText;
   final bool obscureText;
-  final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
+  final TextInputType keyboardType;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onSubmitted;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final int? maxLines;
 
   const GlassTextField({
     super.key,
-    this.label,
-    this.hint,
-    this.controller,
+    required this.controller,
+    required this.hintText,
+    this.errorText,
     this.obscureText = false,
-    this.keyboardType,
-    this.validator,
+    this.keyboardType = TextInputType.text,
+    this.onChanged,
+    this.onSubmitted,
     this.prefixIcon,
     this.suffixIcon,
-    this.maxLines = 1,
   });
 
   @override
@@ -42,55 +38,39 @@ class _GlassTextFieldState extends State<GlassTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.label != null) ...[
-          Text(
-            widget.label!,
-            style: AppTypography.label.copyWith(
-              color: AppColors.textSecondary,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: AppEffects.blurMedium,
+              sigmaY: AppEffects.blurMedium,
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: _isFocused
-                ? AppColors.glassSurfaceDark
-                : AppColors.glassSurface,
-            borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
-            border: Border.all(
-              color: _isFocused
-                  ? AppColors.borderGlassDark
-                  : AppColors.borderGlass,
-              width: 1.0,
-            ),
-            boxShadow: [
-              if (_isFocused)
-                const BoxShadow(
-                  color: AppColors.primaryGlass,
-                  blurRadius: 15,
-                  offset: Offset(0, 4),
+            child: Container(
+              decoration: BoxDecoration(
+                color: _isFocused
+                    ? AppColors.glassSurfaceLight
+                    : AppColors.glassSurface,
+                borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+                border: Border.all(
+                  color: widget.errorText != null
+                      ? AppColors.error
+                      : _isFocused
+                          ? AppColors.deepPurple.withOpacity(0.5)
+                          : AppColors.borderGlassLight,
+                  width: _isFocused ? 2.0 : 1.0,
                 ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: AppEffects.blurLight,
-                sigmaY: AppEffects.blurLight,
               ),
-              child: TextFormField(
+              child: TextField(
                 controller: widget.controller,
                 obscureText: widget.obscureText,
                 keyboardType: widget.keyboardType,
-                validator: widget.validator,
-                maxLines: widget.maxLines,
+                onChanged: widget.onChanged,
+                onSubmitted: (_) => widget.onSubmitted?.call(),
                 style: AppTypography.bodyMedium,
                 decoration: InputDecoration(
-                  hintText: widget.hint,
+                  hintText: widget.hintText,
                   hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textTertiary,
+                    color: AppColors.textHint,
                   ),
                   prefixIcon: widget.prefixIcon,
                   suffixIcon: widget.suffixIcon,
@@ -100,12 +80,35 @@ class _GlassTextFieldState extends State<GlassTextField> {
                     vertical: AppSpacing.md,
                   ),
                 ),
-                onTap: () => setState(() => _isFocused = true),
-                onTapOutside: (_) => setState(() => _isFocused = false),
+                onTapOutside: (_) {
+                  FocusScope.of(context).unfocus();
+                },
+                onTap: () {
+                  setState(() {
+                    _isFocused = true;
+                  });
+                },
+                onEditingComplete: () {
+                  setState(() {
+                    _isFocused = false;
+                  });
+                },
               ),
             ),
           ),
         ),
+        if (widget.errorText != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.sm),
+            child: Text(
+              widget.errorText!,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

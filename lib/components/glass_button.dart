@@ -1,19 +1,20 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../app/theme/app_colors.dart';
-import '../app/theme/app_effects.dart';
-import '../app/theme/app_spacing.dart';
-import '../app/theme/app_typography.dart';
+import 'package:vibe_moon_web/app/theme/theme.dart';
 
-/// 글래스모피즘 버튼
+enum GlassButtonType {
+  primary,
+  secondary,
+  outlined,
+}
+
 class GlassButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
   final GlassButtonType type;
-  final IconData? icon;
   final double? width;
-  final double height;
+  final Widget? icon;
 
   const GlassButton({
     super.key,
@@ -21,9 +22,8 @@ class GlassButton extends StatefulWidget {
     this.onPressed,
     this.isLoading = false,
     this.type = GlassButtonType.primary,
-    this.icon,
     this.width,
-    this.height = 48,
+    this.icon,
   });
 
   @override
@@ -35,32 +35,55 @@ class _GlassButtonState extends State<GlassButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isEnabled = widget.onPressed != null && !widget.isLoading;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: widget.width,
-        height: widget.height,
-        decoration: _getDecoration(),
+      child: AnimatedScale(
+        scale: _isHovered && isEnabled ? 1.02 : 1.0,
+        duration: const Duration(milliseconds: 150),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
           child: BackdropFilter(
             filter: ImageFilter.blur(
-              sigmaX: AppEffects.blurMedium,
-              sigmaY: AppEffects.blurMedium,
+              sigmaX: AppEffects.blurLight,
+              sigmaY: AppEffects.blurLight,
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: widget.isLoading ? null : widget.onPressed,
-                borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
+            child: Container(
+              width: widget.width,
+              height: 56,
+              decoration: _getDecoration(isEnabled),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: isEnabled ? widget.onPressed : null,
+                  child: Center(
+                    child: widget.isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.icon != null) ...[
+                                widget.icon!,
+                                const SizedBox(width: AppSpacing.xs),
+                              ],
+                              Text(
+                                widget.text,
+                                style: _getTextStyle(isEnabled),
+                              ),
+                            ],
+                          ),
                   ),
-                  child: _buildContent(),
                 ),
               ),
             ),
@@ -70,104 +93,68 @@ class _GlassButtonState extends State<GlassButton> {
     );
   }
 
-  Widget _buildContent() {
-    if (widget.isLoading) {
-      return const Center(
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      );
-    }
-
-    if (widget.icon != null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(widget.icon, size: 20, color: AppColors.textPrimary),
-          const SizedBox(width: AppSpacing.sm),
-          Text(widget.text, style: AppTypography.button),
-        ],
-      );
-    }
-
-    return Center(
-      child: Text(widget.text, style: AppTypography.button),
-    );
-  }
-
-  BoxDecoration _getDecoration() {
+  BoxDecoration _getDecoration(bool isEnabled) {
     switch (widget.type) {
       case GlassButtonType.primary:
         return BoxDecoration(
-          gradient: _isHovered
-              ? AppColors.primaryGradient
-              : const LinearGradient(
-                  colors: [
-                    AppColors.primaryGlass,
-                    AppColors.secondaryGlass,
-                  ],
-                ),
+          color: isEnabled
+              ? AppColors.deepPurple
+              : AppColors.deepPurple.withOpacity(0.5),
           borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
-          border: Border.all(
-            color: _isHovered
-                ? AppColors.borderGlassDark
-                : AppColors.borderGlass,
-            width: 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _isHovered
-                  ? AppColors.primaryGlass
-                  : AppColors.shadowLight,
-              blurRadius: _isHovered ? 20 : 10,
-              offset: Offset(0, _isHovered ? 8 : 4),
-            ),
-          ],
+          boxShadow: isEnabled
+              ? [
+                  BoxShadow(
+                    color: AppColors.deepPurple.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : null,
         );
-
       case GlassButtonType.secondary:
         return BoxDecoration(
-          color: _isHovered
-              ? AppColors.glassSurfaceDark
+          color: isEnabled
+              ? AppColors.glassSurfaceLight
               : AppColors.glassSurface,
           borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.borderGlassDark
-                : AppColors.borderGlass,
+            color: AppColors.borderGlassLight,
             width: 1.0,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: _isHovered ? 15 : 10,
-              offset: Offset(0, _isHovered ? 6 : 4),
-            ),
-          ],
         );
-
       case GlassButtonType.outlined:
         return BoxDecoration(
-          color: _isHovered
-              ? AppColors.glassSurfaceLight
-              : Colors.transparent,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.borderGlassDark
-                : AppColors.borderGlass,
-            width: 1.5,
+            color: isEnabled
+                ? AppColors.deepPurple
+                : AppColors.deepPurple.withOpacity(0.5),
+            width: 2.0,
           ),
+        );
+    }
+  }
+
+  TextStyle _getTextStyle(bool isEnabled) {
+    switch (widget.type) {
+      case GlassButtonType.primary:
+        return AppTypography.button.copyWith(
+          color: isEnabled ? Colors.white : Colors.white.withOpacity(0.7),
+        );
+      case GlassButtonType.secondary:
+        return AppTypography.button.copyWith(
+          color: isEnabled
+              ? AppColors.textPrimaryLight
+              : AppColors.textSecondaryLight,
+        );
+      case GlassButtonType.outlined:
+        return AppTypography.button.copyWith(
+          color: isEnabled
+              ? AppColors.deepPurple
+              : AppColors.deepPurple.withOpacity(0.5),
         );
     }
   }
 }
-
-enum GlassButtonType { primary, secondary, outlined }
 

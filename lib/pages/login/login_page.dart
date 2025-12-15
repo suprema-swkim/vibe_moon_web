@@ -1,13 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vibe_moon_web/app/theme/theme.dart';
 import 'package:vibe_moon_web/components/widgets.dart';
-import 'package:vibe_moon_web/core/core.dart';
-import 'dart:developer' as developer;
-import 'login_page_vm.dart';
+import 'package:vibe_moon_web/pages/login/login_page_vm.dart';
 
-/// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -16,153 +14,121 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleLogin() async {
-    final viewModel = ref.read(loginViewModelProvider.notifier);
-    final success = await viewModel.login(
-      _emailController.text,
-      _passwordController.text,
-    );
-
-    if (success && mounted) {
-      context.go('/home');
-    }
+  void initState() {
+    super.initState();
+    // ViewModel의 컨트롤러 초기화
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = ref.read(loginPageViewModelProvider.notifier);
+      viewModel.emailController.addListener(() {
+        viewModel.updateEmail(viewModel.emailController.text);
+      });
+      viewModel.passwordController.addListener(() {
+        viewModel.updatePassword(viewModel.passwordController.text);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginViewModelProvider);
-    final cardWidth = ResponsiveHelper.getResponsiveValue(
-      context,
-      mobile: double.infinity,
-      tablet: 400.0,
-      desktop: 400.0,
-    );
+    final state = ref.watch(loginPageViewModelProvider);
+    final viewModel = ref.read(loginPageViewModelProvider.notifier);
 
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: AppColors.darkBgGradient,
+          gradient: AppColors.pastelBgGradient,
         ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: ResponsiveHelper.getResponsivePadding(context),
-            child: SizedBox(
-              width: cardWidth,
-              child: Form(
-                key: _formKey,
-                child: GlassCard(
-                  padding: const EdgeInsets.all(AppSpacing.glassCardPadding),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // 로고/타이틀
-                      _buildHeader(),
-                      const SizedBox(height: AppSpacing.xl),
+        child: SafeArea(
+          child: ResponsiveLayout(
+            mobile: _buildMobileLayout(context, state, viewModel),
+            tablet: _buildTabletLayout(context, state, viewModel),
+            desktop: _buildDesktopLayout(context, state, viewModel),
+          ),
+        ),
+      ),
+    );
+  }
 
-                      // 에러 메시지
-                      if (loginState.errorMessage != null) ...[
-                        _buildErrorMessage(loginState.errorMessage!),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
+  Widget _buildMobileLayout(
+    BuildContext context,
+    LoginPageState state,
+    LoginPageViewModel viewModel,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: AppSpacing.xxl),
+          _buildLoginCard(context, state, viewModel, maxWidth: double.infinity),
+          const SizedBox(height: AppSpacing.xxl),
+        ],
+      ),
+    );
+  }
 
-                      // 이메일 입력
-                      GlassTextField(
-                        label: '이메일',
-                        hint: 'example@email.com',
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        prefixIcon: const Icon(
-                          Icons.email_outlined,
-                          color: AppColors.textSecondary,
-                        ),
-                        validator: ref
-                            .read(loginViewModelProvider.notifier)
-                            .validateEmail,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+  Widget _buildTabletLayout(
+    BuildContext context,
+    LoginPageState state,
+    LoginPageViewModel viewModel,
+  ) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: _buildLoginCard(context, state, viewModel, maxWidth: 480),
+      ),
+    );
+  }
 
-                      // 비밀번호 입력
-                      GlassTextField(
-                        label: '비밀번호',
-                        hint: '최소 8자 이상',
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        prefixIcon: const Icon(
-                          Icons.lock_outline,
-                          color: AppColors.textSecondary,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                        validator: ref
-                            .read(loginViewModelProvider.notifier)
-                            .validatePassword,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+  Widget _buildDesktopLayout(
+    BuildContext context,
+    LoginPageState state,
+    LoginPageViewModel viewModel,
+  ) {
+    return Center(
+      child: _buildLoginCard(context, state, viewModel, maxWidth: 480),
+    );
+  }
 
-                      // 로그인 상태 유지 체크박스
-                      _buildRememberMeCheckbox(loginState.rememberMe),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // 로그인 버튼
-                      GlassButton(
-                        text: '로그인',
-                        onPressed: loginState.isLoading ? null : _handleLogin,
-                        isLoading: loginState.isLoading,
-                        width: double.infinity,
-                        height: 56,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-
-                      // 비밀번호 찾기
-                      Center(
-                        child: TextButton(
-                          onPressed: () {
-                            developer.log(
-                              'Forgot password clicked',
-                              name: 'LoginPage',
-                            );
-                          },
-                          child: Text(
-                            '비밀번호를 잊으셨나요?',
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-
-                      // 회원가입 링크
-                      _buildSignupLink(),
-                    ],
-                  ),
-                ),
-              ),
+  Widget _buildLoginCard(
+    BuildContext context,
+    LoginPageState state,
+    LoginPageViewModel viewModel, {
+    required double maxWidth,
+  }) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppEffects.radiusLarge),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: AppEffects.blurMedium,
+            sigmaY: AppEffects.blurMedium,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: AppEffects.glassCard(
+              borderRadius: AppEffects.radiusLarge,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: AppSpacing.xl),
+                _buildEmailField(state, viewModel),
+                const SizedBox(height: AppSpacing.md),
+                _buildPasswordField(state, viewModel),
+                const SizedBox(height: AppSpacing.lg),
+                if (state.errorMessage != null) ...[
+                  _buildErrorMessage(state.errorMessage!),
+                  const SizedBox(height: AppSpacing.md),
+                ],
+                _buildLoginButton(state, viewModel),
+                const SizedBox(height: AppSpacing.lg),
+                _buildFooterLinks(context),
+              ],
             ),
           ),
         ),
@@ -174,43 +140,91 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
             shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.pastelPink.withOpacity(0.8),
+                AppColors.pastelPurple.withOpacity(0.8),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.deepPurple.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: const Icon(
-            Icons.nightlight_round,
-            size: 48,
-            color: AppColors.textPrimary,
+            Icons.lock_outline_rounded,
+            size: 40,
+            color: Colors.white,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.lg),
         Text(
-          'Vibe Moon',
-          style: AppTypography.h2.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          '로그인',
+          style: AppTypography.h1,
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.xs),
         Text(
-          '로그인하여 계속하기',
+          '계정에 로그인하여 시작하세요',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondaryLight,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
+  Widget _buildEmailField(LoginPageState state, LoginPageViewModel viewModel) {
+    return GlassTextField(
+      controller: viewModel.emailController,
+      hintText: '이메일',
+      errorText: state.emailError,
+      keyboardType: TextInputType.emailAddress,
+      prefixIcon: const Icon(
+        Icons.email_outlined,
+        color: AppColors.textSecondaryLight,
+      ),
+      onSubmitted: () {
+        _handleLogin(viewModel);
+      },
+    );
+  }
+
+  Widget _buildPasswordField(
+    LoginPageState state,
+    LoginPageViewModel viewModel,
+  ) {
+    return GlassTextField(
+      controller: viewModel.passwordController,
+      hintText: '비밀번호',
+      errorText: state.passwordError,
+      obscureText: true,
+      prefixIcon: const Icon(
+        Icons.lock_outline_rounded,
+        color: AppColors.textSecondaryLight,
+      ),
+      onSubmitted: () {
+        _handleLogin(viewModel);
+      },
+    );
+  }
+
   Widget _buildErrorMessage(String message) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.errorGlass,
+        color: AppColors.error.withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppEffects.radiusSmall),
         border: Border.all(
-          color: AppColors.errorSolid.withOpacity(0.3),
+          color: AppColors.error.withOpacity(0.3),
           width: 1.0,
         ),
       ),
@@ -218,15 +232,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         children: [
           const Icon(
             Icons.error_outline,
-            color: AppColors.errorSolid,
+            color: AppColors.error,
             size: 20,
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
               message,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.errorSolid,
+                color: AppColors.error,
               ),
             ),
           ),
@@ -235,63 +249,82 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildRememberMeCheckbox(bool rememberMe) {
-    return Row(
+  Widget _buildLoginButton(
+    LoginPageState state,
+    LoginPageViewModel viewModel,
+  ) {
+    return GlassButton(
+      text: '로그인',
+      isLoading: state.isLoading,
+      onPressed: state.isLoading ? null : () => _handleLogin(viewModel),
+      width: double.infinity,
+    );
+  }
+
+  Widget _buildFooterLinks(BuildContext context) {
+    return Column(
       children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(
-            value: rememberMe,
-            onChanged: (_) {
-              ref.read(loginViewModelProvider.notifier).toggleRememberMe();
-            },
-            activeColor: AppColors.primarySolid,
-            checkColor: AppColors.textPrimary,
-            side: const BorderSide(
-              color: AppColors.borderGlass,
-              width: 1.5,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                _showComingSoonSnackBar(context, '비밀번호 찾기');
+              },
+              child: Text(
+                '비밀번호 찾기',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.deepPurple,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-        const SizedBox(width: AppSpacing.sm),
-        Text(
-          '로그인 상태 유지',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondary,
-          ),
+        const SizedBox(height: AppSpacing.xs),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '계정이 없으신가요?',
+              style: AppTypography.bodySmall,
+            ),
+            TextButton(
+              onPressed: () {
+                _showComingSoonSnackBar(context, '회원가입');
+              },
+              child: Text(
+                '회원가입',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.deepPurple,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildSignupLink() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '계정이 없으신가요?',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondary,
-          ),
+  Future<void> _handleLogin(LoginPageViewModel viewModel) async {
+    final success = await viewModel.login();
+    if (success && mounted) {
+      context.go('/home');
+    }
+  }
+
+  void _showComingSoonSnackBar(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature 기능은 준비 중입니다'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.deepPurple,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppEffects.radiusSmall),
         ),
-        TextButton(
-          onPressed: () {
-            developer.log(
-              'Signup clicked',
-              name: 'LoginPage',
-            );
-          },
-          child: Text(
-            '회원가입',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.primarySolid,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
+        margin: const EdgeInsets.all(AppSpacing.md),
+      ),
     );
   }
 }
-

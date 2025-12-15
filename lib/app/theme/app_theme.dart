@@ -1,62 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:vibe_moon_web/app/theme/app_colors.dart';
+import 'package:vibe_moon_web/app/theme/app_effects.dart';
+import 'package:vibe_moon_web/app/theme/app_typography.dart';
 
-/// 앱 테마 설정
 class AppTheme {
-  AppTheme._();
-
-  // 라이트 테마
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
-        brightness: Brightness.light,
-      ),
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 0,
-      ),
-      cardTheme: CardTheme(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-    );
-  }
+      brightness: Brightness.light,
+      primaryColor: AppColors.deepPurple,
+      scaffoldBackgroundColor: Colors.transparent, // 투명하게 설정하여 배경 그라데이션 노출
 
-  // 다크 테마
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
+      // Color Scheme
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
-        brightness: Brightness.dark,
+        seedColor: AppColors.deepPurple,
+        brightness: Brightness.light,
+        surface: AppColors.glassSurfaceLight,
+        error: AppColors.error,
       ),
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 0,
+
+      // Typography
+      textTheme: const TextTheme(
+        displayLarge: AppTypography.h1,
+        displayMedium: AppTypography.h2,
+        displaySmall: AppTypography.h3,
+        bodyLarge: AppTypography.bodyLarge,
+        bodyMedium: AppTypography.bodyMedium,
+        bodySmall: AppTypography.bodySmall,
+        labelLarge: AppTypography.button,
       ),
-      cardTheme: CardTheme(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+
+      // Input Decoration (Glass Style)
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.glassSurfaceLight,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+          borderSide: const BorderSide(color: AppColors.borderGlassLight),
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+          borderSide: const BorderSide(color: AppColors.borderGlassLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+          borderSide: const BorderSide(color: AppColors.deepPurple, width: 1.5),
+        ),
+        hintStyle: const TextStyle(color: AppColors.textHint),
       ),
+
+      // Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.deepPurple,
+          foregroundColor: Colors.white,
+          elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
           ),
+          textStyle: AppTypography.button,
         ),
       ),
     );

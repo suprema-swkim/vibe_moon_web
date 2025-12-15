@@ -1,61 +1,59 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../app/theme/app_colors.dart';
-import '../app/theme/app_spacing.dart';
-import '../app/theme/app_typography.dart';
-import 'glass_card.dart';
+import 'package:vibe_moon_web/app/theme/theme.dart';
 
-/// 글래스모피즘 로딩 인디케이터
 class GlassLoadingIndicator extends StatelessWidget {
+  final double size;
+  final Color? color;
   final String? message;
-  final bool showOverlay;
 
   const GlassLoadingIndicator({
     super.key,
+    this.size = 48.0,
+    this.color,
     this.message,
-    this.showOverlay = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final content = Center(
-      child: GlassCard(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppColors.primarySolid,
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppEffects.radiusMedium),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: AppEffects.blurMedium,
+            sigmaY: AppEffects.blurMedium,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: AppEffects.glassCard(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: size,
+                  height: size,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3.0,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      color ?? AppColors.deepPurple,
+                    ),
+                  ),
                 ),
-              ),
+                if (message != null) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    message!,
+                    style: AppTypography.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
             ),
-            if (message != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                message!,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
-
-    if (showOverlay) {
-      return Container(
-        color: AppColors.bgDark.withOpacity(0.5),
-        child: content,
-      );
-    }
-
-    return content;
   }
 }
 
