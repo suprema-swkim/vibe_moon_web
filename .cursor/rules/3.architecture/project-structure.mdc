@@ -12,71 +12,207 @@ alwaysApply: true
 
 ```
 lib/
-├── main.dart                    # 앱 진입점
-├── app/                         # 앱 레벨 설정 및 라우팅
-│   ├── app.dart                 # App 위젯 정의
-│   ├── router.dart              # go_router 라우팅 설정
-│   └── theme/                   # 앱 테마 설정
-│       ├── app_theme.dart
-│       └── theme_extensions.dart
-├── core/                        # 공통 유틸리티 및 상수
-│   ├── constants/               # 상수 정의
-│   │   ├── api_constants.dart
-│   │   ├── app_constants.dart
-│   │   └── asset_constants.dart
-│   ├── utils/                   # 유틸리티 함수
-│   │   ├── logger.dart
-│   │   ├── date_formatter.dart
-│   │   └── validators.dart
-│   ├── extensions/              # Dart 확장 메서드
-│   │   ├── string_extension.dart
-│   │   ├── datetime_extension.dart
-│   │   └── context_extension.dart
-│   └── errors/                  # 에러 처리
-│       ├── exceptions.dart
-│       └── failures.dart
-├── data/                        # 데이터 계층
-│   ├── models/                  # 데이터 모델 (JSON 직렬화)
-│   │   ├── branch_model.dart
-│   │   ├── branch_model.g.dart
-│   │   └── ...
-│   ├── repositories/            # Repository 구현체
-│   │   ├── branch_repository.dart
-│   │   └── ...
-│   └── sources/                 # 데이터 소스 (API, Local DB)
-│       ├── remote/              # 원격 데이터 소스
-│       │   ├── api_client.dart
-│       │   └── branch_api.dart
-│       └── local/               # 로컬 데이터 소스
-│           └── local_storage.dart
-├── domain/                      # 도메인 계층 (비즈니스 로직)
-│   ├── entities/                # 도메인 엔티티
-│   │   ├── branch.dart
-│   │   └── ...
-│   ├── repositories/            # Repository 인터페이스
-│   │   ├── i_branch_repository.dart
-│   │   └── ...
-│   └── usecases/                # 유스케이스 (복잡한 비즈니스 로직 시 사용)
-│       └── get_branch_list.dart
-├── pages/                       # 화면 계층 (MVVM 패턴)
-│   ├── home/                    # Home 화면
-│   │   ├── home_page.dart       # Home 화면 UI (View)
-│   │   └── home_page_vm.dart    # Home 화면 ViewModel (상태 + 로직)
-│   ├── branch/                  # Branch 화면
-│   │   ├── branch_list_page.dart
-│   │   ├── branch_list_page_vm.dart
-│   │   ├── branch_detail_page.dart
-│   │   └── branch_detail_page_vm.dart
-│   ├── place_group/             # PlaceGroup 화면
-│   │   ├── place_group_list_page.dart
-│   │   └── place_group_list_page_vm.dart
-│   └── place/                   # Place 화면
-│       ├── place_list_page.dart
-│       ├── place_list_page_vm.dart
-│       ├── place_detail_page.dart
-│       └── place_detail_page_vm.dart
-└── widgets/                     # 공통 위젯
-    ├── custom_button.dart
-    ├── loading_indicator.dart
-    └── error_view.dart
+├── main.dart                         # 앱 진입점
+├── app/                              # 앱 레벨 설정 및 라우팅
+│   ├── app.dart                      # App 위젯 정의
+│   ├── router.dart                   # go_router 라우팅 설정
+│   └── theme/                        # 앱 테마 설정 (글래스모피즘 2.0)
+│       ├── app_colors.dart           # 색상 팔레트 (Glass 변형 포함)
+│       ├── app_effects.dart          # 블러 및 글래스 효과 프리셋
+│       ├── app_spacing.dart          # 간격 및 여백 상수
+│       ├── app_theme.dart            # ThemeData 설정
+│       ├── app_typography.dart       # 타이포그래피 스타일
+│       └── theme.dart                # 테마 export 파일
+├── components/                       # 재사용 가능한 UI 컴포넌트
+│   ├── glass_button.dart             # 글래스모피즘 버튼
+│   ├── glass_card.dart               # 글래스모피즘 카드
+│   ├── glass_empty_view.dart         # 빈 상태 뷰
+│   ├── glass_error_view.dart         # 에러 뷰
+│   ├── glass_loading_indicator.dart  # 로딩 인디케이터
+│   ├── glass_text_field.dart         # 글래스모피즘 입력 필드
+│   ├── responsive_layout.dart        # 반응형 레이아웃 위젯
+│   └── widgets.dart                  # 컴포넌트 export 파일
+├── core/                             # 공통 유틸리티 및 상수
+│   ├── core.dart                     # Core export 파일
+│   ├── constants/                    # 상수 정의
+│   │   ├── animation_constants.dart  # 애니메이션 상수
+│   │   ├── app_constants.dart        # 앱 전역 상수
+│   │   └── breakpoints.dart          # 반응형 브레이크포인트
+│   ├── extensions/                   # Dart 확장 메서드
+│   │   ├── context_extension.dart    # BuildContext 확장
+│   │   └── string_extension.dart     # String 확장
+│   └── utils/                        # 유틸리티 함수
+│       ├── animation_helper.dart     # 애니메이션 헬퍼
+│       ├── logger.dart               # 로깅 유틸리티
+│       ├── responsive_helper.dart    # 반응형 헬퍼
+│       └── web_optimizer.dart        # 웹 성능 최적화
+└── pages/                            # 화면 계층 (MVVM 패턴)
+    └── home/                         # Home 화면
+        ├── home_page.dart            # Home 화면 UI (View)
+        └── home_page_vm.dart         # Home 화면 ViewModel (상태 + 로직)
 ```
+
+## 2. 📋 계층별 상세 설명
+
+### 2.1 app/ - 앱 레벨 설정
+**목적**: 앱 전역 설정, 라우팅, 테마 관리
+
+- `app.dart`: MaterialApp 또는 ProviderScope 설정
+- `router.dart`: go_router 기반 라우팅 설정
+- `theme/`: 글래스모피즘 2.0 디자인 시스템
+  - 색상, 타이포그래피, 간격, 효과 등 통합 관리
+
+### 2.2 components/ - 재사용 UI 컴포넌트
+**목적**: 프로젝트 전역에서 재사용 가능한 글래스모피즘 UI 컴포넌트
+
+**네이밍 규칙**:
+- `glass_*.dart`: 글래스모피즘 스타일 컴포넌트
+- `{기능}_{타입}.dart`: 예) `glass_button.dart`, `glass_card.dart`
+
+**컴포넌트 종류**:
+- **버튼**: `GlassButton` (primary, secondary, outlined)
+- **카드**: `GlassCard` (호버 효과, 클릭 가능)
+- **입력**: `GlassTextField` (포커스 효과)
+- **상태**: `GlassLoadingIndicator`, `GlassErrorView`, `GlassEmptyView`
+- **레이아웃**: `ResponsiveLayout` (모바일/태블릿/데스크톱)
+
+### 2.3 core/ - 공통 유틸리티
+**목적**: 앱 전역에서 사용되는 유틸리티, 상수, 확장 메서드
+
+**하위 구조**:
+- `constants/`: 변하지 않는 값 (애니메이션 duration, 브레이크포인트 등)
+- `extensions/`: Dart 기본 타입 확장 (BuildContext, String 등)
+- `utils/`: 헬퍼 함수 (로깅, 반응형 계산, 웹 최적화 등)
+
+### 2.4 pages/ - 화면 계층
+**목적**: MVVM 패턴 기반 화면 구현
+
+**네이밍 규칙**:
+- 폴더명: `{화면명}/` (예: `home/`, `login/`, `branch_list/`)
+- View: `{화면명}_page.dart` (예: `home_page.dart`)
+- ViewModel: `{화면명}_page_vm.dart` (예: `home_page_vm.dart`)
+
+**구조 예시**:
+```
+pages/
+├── home/
+│   ├── home_page.dart          # UI (StatelessWidget + ConsumerWidget)
+│   └── home_page_vm.dart       # 상태 관리 (Riverpod Provider)
+├── branch/
+│   ├── branch_list_page.dart
+│   ├── branch_list_page_vm.dart
+│   ├── branch_detail_page.dart
+│   └── branch_detail_page_vm.dart
+└── auth/
+    ├── login_page.dart
+    └── login_page_vm.dart
+```
+
+## 3. 📝 파일 네이밍 규칙
+
+### 3.1 Dart 파일명
+- **소문자 + 언더스코어**: `home_page.dart`, `glass_button.dart`
+- **명확한 접미사**: `_page`, `_vm`, `_widget`, `_model`, `_repository`
+
+### 3.2 클래스명
+- **PascalCase**: `HomePage`, `GlassButton`, `BranchModel`
+- **접미사 일치**: 파일명과 동일한 접미사 사용
+
+### 3.3 Export 파일
+- **목적**: 여러 파일을 하나로 묶어 import 간소화
+- **네이밍**: 폴더명과 동일 (예: `theme.dart`, `widgets.dart`, `core.dart`)
+
+**예시**:
+```dart
+// lib/components/widgets.dart
+export 'glass_button.dart';
+export 'glass_card.dart';
+export 'glass_text_field.dart';
+export 'glass_loading_indicator.dart';
+export 'glass_error_view.dart';
+export 'glass_empty_view.dart';
+export 'responsive_layout.dart';
+```
+
+## 4. 🎯 새 기능 추가 시 가이드
+
+### 4.1 새로운 화면 추가
+1. `pages/` 하위에 화면명 폴더 생성
+2. `{화면명}_page.dart` 파일 생성 (View)
+3. `{화면명}_page_vm.dart` 파일 생성 (ViewModel)
+4. `app/router.dart`에 라우트 추가
+
+**예시**:
+```dart
+// pages/branch_list/branch_list_page.dart
+class BranchListPage extends ConsumerWidget {
+  const BranchListPage({super.key});
+  
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final branchListState = ref.watch(branchListViewModelProvider);
+    // UI 구현
+  }
+}
+
+// pages/branch_list/branch_list_page_vm.dart
+@riverpod
+class BranchListViewModel extends _$BranchListViewModel {
+  @override
+  FutureOr<List<Branch>> build() async {
+    // 상태 로직
+  }
+}
+```
+
+### 4.2 새로운 컴포넌트 추가
+1. `components/` 하위에 `{컴포넌트명}.dart` 파일 생성
+2. 글래스모피즘 스타일 적용 (BackdropFilter, 투명도, 테두리)
+3. `components/widgets.dart`에 export 추가
+
+### 4.3 새로운 유틸리티 추가
+1. `core/utils/` 하위에 `{기능명}_helper.dart` 파일 생성
+2. 순수 함수로 구현 (부작용 없이)
+3. `core/core.dart`에 export 추가
+
+## 5. 🚫 금지 사항
+
+### ❌ 하지 말아야 할 것
+- **하드코딩된 경로**: `import 'package:vibe_moon_web/app/theme/app_colors.dart';` 대신 `import '../theme/theme.dart';` 사용
+- **깊은 중첩**: 3단계 이상 폴더 중첩 지양
+- **혼재된 책임**: View에 비즈니스 로직 포함 금지
+- **일관성 없는 네이밍**: 파일명과 클래스명 불일치 금지
+
+### ✅ 올바른 패턴
+- **상대 경로 import**: 같은 모듈 내에서는 상대 경로 사용
+- **Export 파일 활용**: `import 'package:vibe_moon_web/components/widgets.dart';`
+- **명확한 계층 분리**: View(UI) ↔ ViewModel(로직) ↔ Repository(데이터)
+- **일관된 네이밍**: `branch_list_page.dart` → `class BranchListPage`
+
+## 6. 📋 체크리스트
+
+### 새 파일 생성 시
+- [ ] 파일명이 소문자 + 언더스코어 형식인가?
+- [ ] 클래스명이 PascalCase이며 파일명과 일치하는가?
+- [ ] 적절한 폴더에 위치하는가? (pages, components, core)
+- [ ] Export 파일에 추가했는가?
+- [ ] 상대 경로 import를 사용했는가?
+
+### 새 화면 추가 시
+- [ ] `pages/{화면명}/` 폴더 생성
+- [ ] `{화면명}_page.dart` 파일 생성
+- [ ] `{화면명}_page_vm.dart` 파일 생성
+- [ ] `app/router.dart`에 라우트 추가
+- [ ] 글래스모피즘 UI 컴포넌트 사용
+
+### 새 컴포넌트 추가 시
+- [ ] `components/` 폴더에 생성
+- [ ] 글래스모피즘 스타일 적용 (BackdropFilter, 투명도)
+- [ ] 반응형 디자인 고려
+- [ ] `components/widgets.dart`에 export 추가
+
+---
+
+**핵심 원칙**: "명확하고, 일관되고, 확장 가능한 구조"
+
+**구조 준수 = 유지보수성 향상 = 개발 속도 증가**

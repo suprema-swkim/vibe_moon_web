@@ -1,9 +1,6 @@
 ---
-description: Flutter 및 Dart 개발 시 준수해야 할 코딩 규칙, 명명 규칙, 아키텍처 패턴, 테스트 전략 등을 정의한 종합 가이드라인
-globs: **/*.dart
-# alwaysApply: true
+alwaysApply: true
 ---
-
 # Flutter를 위한 AI 규칙
 
 ## 🎭 Role (역할)
