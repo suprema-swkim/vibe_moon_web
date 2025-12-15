@@ -175,28 +175,67 @@ class BranchListViewModel extends _$BranchListViewModel {
 2. 순수 함수로 구현 (부작용 없이)
 3. `core/core.dart`에 export 추가
 
-## 5. 🚫 금지 사항
+## 5. 📦 Import 규칙
+
+### ✅ **필수**: Package Import 사용
+- **모든 import는 package 경로 사용**: `import 'package:vibe_moon_web/...';`
+- **상대 경로 금지**: `import '../../app/theme/theme.dart';` ❌
+- **일관성**: 프로젝트 내 모든 파일에서 동일한 import 방식 사용
+
+### 올바른 Import 예시
+```dart
+// ✅ Good: Package import 사용
+import 'package:vibe_moon_web/app/theme/theme.dart';
+import 'package:vibe_moon_web/components/widgets.dart';
+import 'package:vibe_moon_web/core/core.dart';
+import 'package:vibe_moon_web/pages/home/home_page.dart';
+
+// ❌ Bad: 상대 경로 사용
+import '../../app/theme/theme.dart';
+import '../components/glass_button.dart';
+import './home_page_vm.dart';
+```
+
+### Import 순서 (권장)
+1. Dart SDK imports (`dart:...`)
+2. Flutter imports (`package:flutter/...`)
+3. 외부 패키지 imports (`package:riverpod/...`, `package:go_router/...`)
+4. 프로젝트 내부 imports (`package:vibe_moon_web/...`)
+
+```dart
+// 예시
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:vibe_moon_web/app/theme/theme.dart';
+import 'package:vibe_moon_web/components/widgets.dart';
+```
+
+## 6. 🚫 금지 사항
 
 ### ❌ 하지 말아야 할 것
-- **하드코딩된 경로**: `import 'package:vibe_moon_web/app/theme/app_colors.dart';` 대신 `import '../theme/theme.dart';` 사용
+- **상대 경로 import**: `import '../../app/theme/theme.dart';` 절대 금지
+- **개별 파일 import**: Export 파일이 있다면 개별 파일 대신 export 파일 사용
 - **깊은 중첩**: 3단계 이상 폴더 중첩 지양
 - **혼재된 책임**: View에 비즈니스 로직 포함 금지
 - **일관성 없는 네이밍**: 파일명과 클래스명 불일치 금지
 
 ### ✅ 올바른 패턴
-- **상대 경로 import**: 같은 모듈 내에서는 상대 경로 사용
+- **Package import 사용**: `import 'package:vibe_moon_web/app/theme/theme.dart';`
 - **Export 파일 활용**: `import 'package:vibe_moon_web/components/widgets.dart';`
 - **명확한 계층 분리**: View(UI) ↔ ViewModel(로직) ↔ Repository(데이터)
 - **일관된 네이밍**: `branch_list_page.dart` → `class BranchListPage`
 
-## 6. 📋 체크리스트
+## 7. 📋 체크리스트
 
 ### 새 파일 생성 시
 - [ ] 파일명이 소문자 + 언더스코어 형식인가?
 - [ ] 클래스명이 PascalCase이며 파일명과 일치하는가?
 - [ ] 적절한 폴더에 위치하는가? (pages, components, core)
 - [ ] Export 파일에 추가했는가?
-- [ ] 상대 경로 import를 사용했는가?
+- [ ] **Package import를 사용했는가?** (`import 'package:vibe_moon_web/...';`)
 
 ### 새 화면 추가 시
 - [ ] `pages/{화면명}/` 폴더 생성
