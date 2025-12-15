@@ -1,0 +1,258 @@
+---
+description: 이 프로젝트에서 사용하는 핵심 개발 용어를 AI가 쉽게 이해하고 참조할 수 있도록 구조화되었습니다.
+globs: **/*.dart
+# alwaysApply: true
+---
+
+# 📚 개발 용어 사전 & Ubiquitous Language (보편 언어)
+
+이 파일은 프로젝트 내 모호함을 없애고, AI와 개발자가 동일한 컨텍스트를 유지하기 위해 작성되었습니다. 코드 작성, 변수 명명, 문서화 시 이 정의를 따르십시오. AI는 이 파일을 참조하여 용어를 일관되게 사용하세요.
+
+## 1. 🏢 계층 구조 (Hierarchy)
+
+\`\`\`
+Branch (1) ──> PlaceGroup (N) ──> Place (N)
+  지점            공간 그룹           공간
+
+예시:
+- Branch: "강남점"
+  └─ PlaceGroup: "회의실 A동"
+      ├─ Place: "회의실 A101"
+      ├─ Place: "회의실 A102"
+      └─ Place: "회의실 A103"
+  └─ PlaceGroup: "스터디룸 B동"
+      ├─ Place: "스터디룸 B201"
+      └─ Place: "스터디룸 B202"
+\`\`\`
+
+## 2. 🏢 비즈니스 도메인 용어 (Domain Terms)
+
+아래 용어는 키-값 형식으로 정의됩니다. AI는 이 용어를 코드 생성 시 우선 적용하세요.
+
+### **Branch**
+- **한국어**: 지점
+- **설명**: 최상위 계층 구조로, 하나의 사업장 또는 지점을 의미합니다.
+- **관계**: 여러 개의 PlaceGroup을 포함할 수 있습니다. (1:N 관계)
+- **속성 예시**: \`branchId\`, \`branchName\`, \`branchAddress\`, \`branchPhoneNumber\`
+- **파일명 예시**: \`BranchModel\`, \`BranchRepository\`, \`branch_list_page.dart\`
+- **Dart 코드 예시**:
+
+\`\`\`dart
+class BranchModel {
+  final String branchId;
+  final String branchName;
+  final String branchAddress;
+  final String? branchPhoneNumber;
+  
+  BranchModel({
+    required this.branchId,
+    required this.branchName,
+    required this.branchAddress,
+    this.branchPhoneNumber,
+  });
+}
+\`\`\`
+
+### **PlaceGroup**
+- **한국어**: 공간 그룹
+- **설명**: 중간 계층 구조로, Branch 내에서 여러 Place를 묶는 그룹입니다.
+- **관계**: 하나의 Branch에 속하며, 여러 Place를 포함합니다. (N:1:N 관계)
+- **속성 예시**: \`placeGroupId\`, \`placeGroupName\`, \`branchId\`, \`placeCount\`
+- **파일명 예시**: \`PlaceGroupModel\`, \`PlaceGroupRepository\`, \`place_group_list_page.dart\`
+- **Dart 코드 예시**:
+
+\`\`\`dart
+class PlaceGroupModel {
+  final String placeGroupId;
+  final String placeGroupName;
+  final String branchId;
+  final int placeCount;
+  
+  PlaceGroupModel({
+    required this.placeGroupId,
+    required this.placeGroupName,
+    required this.branchId,
+    required this.placeCount,
+  });
+}
+\`\`\`
+
+### **Place**
+- **한국어**: 공간
+- **설명**: 최하위 계층 구조로, PlaceGroup 내의 개별 공간 단위입니다. 실제 서비스가 제공되는 공간을 의미합니다.
+  - **물리적 공간 예시**: 회의실 A101, 스터디룸 B201, 세미나실 C301
+  - **논리적 공간 예시**: 온라인 화상회의실, 가상 스터디룸
+- **관계**: 하나의 PlaceGroup에 속합니다. (N:1 관계)
+- **속성 예시**: \`placeId\`, \`placeName\`, \`placeGroupId\`, \`capacity\`, \`price\`
+- **파일명 예시**: \`PlaceModel\`, \`PlaceRepository\`, \`place_detail_page.dart\`
+- **Dart 코드 예시**:
+
+\`\`\`dart
+class PlaceModel {
+  final String placeId;
+  final String placeName;
+  final String placeGroupId;
+  final int capacity;
+  final double price;
+  final PlaceType type; // physical or virtual
+  
+  PlaceModel({
+    required this.placeId,
+    required this.placeName,
+    required this.placeGroupId,
+    required this.capacity,
+    required this.price,
+    required this.type,
+  });
+}
+
+enum PlaceType {
+  physical,  // 물리적 공간 (회의실, 스터디룸 등)
+  virtual,   // 논리적 공간 (온라인 화상회의실 등)
+}
+\`\`\`
+
+## 3. 👤 사용자 관련 용어
+
+### **User**
+- **한국어**: 사용자
+- **설명**: 시스템을 사용하는 모든 사용자를 의미합니다.
+- **코드 컨텍스트**: 사용자 인증 및 권한 관리에 사용합니다.
+- **속성 예시**: \`userId\`, \`userEmail\`, \`userRole\`
+- **파일명 예시**: \`UserService\`, \`UserRepository\`, \`user_profile_page.dart\`
+
+### **Member**
+- **한국어**: 회원
+- **설명**: 서비스에 가입한 정회원을 의미합니다.
+- **코드 컨텍스트**: 회원 정보 관리에 사용합니다.
+- **속성 예시**: \`memberId\`, \`memberName\`, \`membershipLevel\`
+- **파일명 예시**: \`MemberService\`, \`MemberRepository\`, \`member_list_page.dart\`
+
+## 4. 📅 예약 관련 용어
+
+### **Reservation**
+- **한국어**: 예약
+- **설명**: 특정 Place에 대한 예약 정보를 의미합니다.
+- **코드 컨텍스트**: 예약 관리에 사용합니다.
+- **속성 예시**: \`reservationId\`, \`placeId\`, \`userId\`, \`startTime\`, \`endTime\`
+- **파일명 예시**: \`ReservationService\`, \`ReservationRepository\`, \`reservation_page.dart\`
+
+### **Booking**
+- **한국어**: 예약 확정
+- **설명**: 확정된 예약 상태를 의미합니다.
+- **코드 컨텍스트**: 예약 확정 처리에 사용합니다.
+- **속성 예시**: \`bookingId\`, \`reservationId\`, \`bookingStatus\`, \`confirmedAt\`
+- **파일명 예시**: \`BookingService\`, \`BookingRepository\`, \`booking_confirmation_page.dart\`
+
+## 5. 💳 결제 관련 용어
+
+### **Payment**
+- **한국어**: 결제
+- **설명**: 서비스 이용에 대한 결제 정보를 의미합니다.
+- **코드 컨텍스트**: 결제 처리에 사용합니다.
+- **속성 예시**: \`paymentId\`, \`bookingId\`, \`amount\`, \`paymentMethod\`, \`paymentStatus\`
+- **파일명 예시**: \`PaymentService\`, \`PaymentRepository\`, \`payment_page.dart\`
+
+## 6. ⭐ 리뷰 관련 용어
+
+### **Review**
+- **한국어**: 리뷰
+- **설명**: 서비스 이용 후 작성하는 평가 및 후기를 의미합니다.
+- **코드 컨텍스트**: 리뷰 관리에 사용합니다.
+- **속성 예시**: \`reviewId\`, \`placeId\`, \`userId\`, \`rating\`, \`comment\`
+- **파일명 예시**: \`ReviewService\`, \`ReviewRepository\`, \`review_list_page.dart\`
+
+### **Rating**
+- **한국어**: 평점
+- **설명**: 서비스에 대한 수치화된 평가를 의미합니다.
+- **코드 컨텍스트**: 평점 계산 및 표시에 사용합니다.
+- **속성 예시**: \`averageRating\`, \`ratingScore\`, \`ratingCount\`
+- **파일명 예시**: \`RatingCalculator\`, \`rating_display_widget.dart\`
+
+## 7. 🌐 API 엔드포인트 네이밍 규칙
+
+API 엔드포인트는 RESTful 원칙을 따르며, 아래 네이밍 규칙을 준수합니다:
+
+### Branch 관련 API
+\`\`\`
+GET    /api/branches              # 지점 목록 조회
+GET    /api/branches/{id}         # 특정 지점 상세 조회
+POST   /api/branches              # 지점 생성
+PUT    /api/branches/{id}         # 지점 수정
+DELETE /api/branches/{id}         # 지점 삭제
+\`\`\`
+
+### PlaceGroup 관련 API
+\`\`\`
+GET    /api/place-groups                    # 공간 그룹 목록 조회
+GET    /api/place-groups/{id}               # 특정 공간 그룹 상세 조회
+GET    /api/branches/{id}/place-groups      # 특정 지점의 공간 그룹 목록
+POST   /api/place-groups                    # 공간 그룹 생성
+PUT    /api/place-groups/{id}               # 공간 그룹 수정
+DELETE /api/place-groups/{id}               # 공간 그룹 삭제
+\`\`\`
+
+### Place 관련 API
+\`\`\`
+GET    /api/places                          # 공간 목록 조회
+GET    /api/places/{id}                     # 특정 공간 상세 조회
+GET    /api/place-groups/{id}/places        # 특정 공간 그룹의 공간 목록
+POST   /api/places                          # 공간 생성
+PUT    /api/places/{id}                     # 공간 수정
+DELETE /api/places/{id}                     # 공간 삭제
+\`\`\`
+
+### Reservation 관련 API
+\`\`\`
+GET    /api/reservations                    # 예약 목록 조회
+GET    /api/reservations/{id}               # 특정 예약 상세 조회
+GET    /api/users/{id}/reservations         # 특정 사용자의 예약 목록
+POST   /api/reservations                    # 예약 생성
+PUT    /api/reservations/{id}               # 예약 수정
+DELETE /api/reservations/{id}               # 예약 취소
+\`\`\`
+
+### Payment 관련 API
+\`\`\`
+GET    /api/payments                        # 결제 목록 조회
+GET    /api/payments/{id}                   # 특정 결제 상세 조회
+POST   /api/payments                        # 결제 생성
+POST   /api/payments/{id}/confirm           # 결제 확정
+POST   /api/payments/{id}/cancel            # 결제 취소
+\`\`\`
+
+### Review 관련 API
+\`\`\`
+GET    /api/reviews                         # 리뷰 목록 조회
+GET    /api/reviews/{id}                    # 특정 리뷰 상세 조회
+GET    /api/places/{id}/reviews             # 특정 공간의 리뷰 목록
+POST   /api/reviews                         # 리뷰 생성
+PUT    /api/reviews/{id}                    # 리뷰 수정
+DELETE /api/reviews/{id}                    # 리뷰 삭제
+\`\`\`
+
+## 8. 📝 네이밍 컨벤션 요약
+
+### 파일명
+- **Model**: \`{entity}_model.dart\` (예: \`branch_model.dart\`)
+- **Repository**: \`{entity}_repository.dart\` (예: \`branch_repository.dart\`)
+- **Service**: \`{entity}_service.dart\` (예: \`branch_service.dart\`)
+- **Page**: \`{entity}_{action}_page.dart\` (예: \`branch_list_page.dart\`)
+- **Widget**: \`{entity}_{description}_widget.dart\` (예: \`branch_card_widget.dart\`)
+
+### 클래스명
+- **Model**: \`{Entity}Model\` (예: \`BranchModel\`)
+- **Repository**: \`{Entity}Repository\` (예: \`BranchRepository\`)
+- **Service**: \`{Entity}Service\` (예: \`BranchService\`)
+- **Page**: \`{Entity}{Action}Page\` (예: \`BranchListPage\`)
+- **Widget**: \`{Entity}{Description}Widget\` (예: \`BranchCardWidget\`)
+
+### 변수명
+- **ID**: \`{entity}Id\` (예: \`branchId\`, \`placeGroupId\`)
+- **Name**: \`{entity}Name\` (예: \`branchName\`, \`placeName\`)
+- **List**: \`{entity}List\` (예: \`branchList\`, \`placeList\`)
+- **Count**: \`{entity}Count\` (예: \`placeCount\`, \`reviewCount\`)
+
+---
+
+**AI 준수 사항**: 이 용어 사전의 모든 정의를 코드 생성, 변수 명명, API 설계 시 일관되게 적용하세요. 새로운 용어가 필요한 경우, 이 파일의 형식을 따라 추가하세요.

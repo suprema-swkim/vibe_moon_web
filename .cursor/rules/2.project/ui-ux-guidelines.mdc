@@ -1,0 +1,469 @@
+# 🎨 UI/UX 가이드라인 (UI/UX Guidelines)
+
+이 파일은 Flutter Web 프로젝트에서 일관되고 우수한 사용자 경험을 제공하기 위한 UI/UX 규칙을 정의합니다.
+
+## 1. 🎯 UI/UX 철학
+
+### 핵심 원칙
+1. **사용자 중심 설계** - 사용자의 편의성과 직관성 최우선
+2. **일관성** - 전체 앱에서 동일한 패턴과 스타일 유지
+3. **반응성** - 모든 화면 크기에서 최적화된 경험 제공
+4. **접근성** - 모든 사용자가 쉽게 사용할 수 있도록 설계
+5. **성능** - 빠르고 부드러운 인터랙션
+
+## 2. 🎨 디자인 시스템
+
+### 색상 팔레트
+
+```dart
+// lib/app/theme/app_colors.dart
+class AppColors {
+  // Primary Colors
+  static const Color primary = Color(0xFF6200EE);
+  static const Color primaryVariant = Color(0xFF3700B3);
+  static const Color onPrimary = Color(0xFFFFFFFF);
+  
+  // Secondary Colors
+  static const Color secondary = Color(0xFF03DAC6);
+  static const Color secondaryVariant = Color(0xFF018786);
+  static const Color onSecondary = Color(0xFF000000);
+  
+  // Background Colors
+  static const Color background = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color onBackground = Color(0xFF000000);
+  static const Color onSurface = Color(0xFF000000);
+  
+  // Error Colors
+  static const Color error = Color(0xFFB00020);
+  static const Color onError = Color(0xFFFFFFFF);
+  
+  // Neutral Colors
+  static const Color grey50 = Color(0xFFFAFAFA);
+  static const Color grey100 = Color(0xFFF5F5F5);
+  static const Color grey200 = Color(0xFFEEEEEE);
+  static const Color grey300 = Color(0xFFE0E0E0);
+  static const Color grey400 = Color(0xFFBDBDBD);
+  static const Color grey500 = Color(0xFF9E9E9E);
+  static const Color grey600 = Color(0xFF757575);
+  static const Color grey700 = Color(0xFF616161);
+  static const Color grey800 = Color(0xFF424242);
+  static const Color grey900 = Color(0xFF212121);
+}
+```
+
+### 타이포그래피
+
+```dart
+// lib/app/theme/app_typography.dart
+class AppTypography {
+  static const TextStyle headline1 = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    height: 1.25,
+  );
+  
+  static const TextStyle headline2 = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    height: 1.33,
+  );
+  
+  static const TextStyle headline3 = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+  );
+  
+  static const TextStyle body1 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    height: 1.5,
+  );
+  
+  static const TextStyle body2 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    height: 1.43,
+  );
+  
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    height: 1.33,
+  );
+  
+  static const TextStyle button = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 1.14,
+  );
+}
+```
+
+### 간격 및 여백
+
+```dart
+// lib/app/theme/app_spacing.dart
+class AppSpacing {
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 16.0;
+  static const double lg = 24.0;
+  static const double xl = 32.0;
+  static const double xxl = 48.0;
+  
+  // 특정 용도
+  static const double cardPadding = 16.0;
+  static const double screenPadding = 24.0;
+  static const double listItemSpacing = 12.0;
+}
+```
+
+## 3. 📱 반응형 디자인
+
+### 브레이크포인트
+
+```dart
+// lib/core/constants/breakpoints.dart
+class Breakpoints {
+  static const double mobile = 600;
+  static const double tablet = 900;
+  static const double desktop = 1200;
+  static const double widescreen = 1800;
+}
+```
+
+### 반응형 레이아웃 헬퍼
+
+```dart
+// lib/core/utils/responsive_helper.dart
+class ResponsiveHelper {
+  static bool isMobile(BuildContext context) {
+    return MediaQuery.of(context).size.width < Breakpoints.mobile;
+  }
+  
+  static bool isTablet(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width >= Breakpoints.mobile && width < Breakpoints.desktop;
+  }
+  
+  static bool isDesktop(BuildContext context) {
+    return MediaQuery.of(context).size.width >= Breakpoints.desktop;
+  }
+  
+  static double getResponsiveValue(
+    BuildContext context, {
+    required double mobile,
+    double? tablet,
+    double? desktop,
+  }) {
+    if (isDesktop(context)) return desktop ?? tablet ?? mobile;
+    if (isTablet(context)) return tablet ?? mobile;
+    return mobile;
+  }
+}
+```
+
+### 반응형 위젯 사용 예시
+
+```dart
+class ResponsiveLayout extends StatelessWidget {
+  final Widget mobile;
+  final Widget? tablet;
+  final Widget? desktop;
+  
+  const ResponsiveLayout({
+    super.key,
+    required this.mobile,
+    this.tablet,
+    this.desktop,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    if (ResponsiveHelper.isDesktop(context)) {
+      return desktop ?? tablet ?? mobile;
+    }
+    if (ResponsiveHelper.isTablet(context)) {
+      return tablet ?? mobile;
+    }
+    return mobile;
+  }
+}
+```
+
+## 4. 🧩 공통 UI 컴포넌트
+
+### 버튼
+
+```dart
+// lib/presentation/common/widgets/custom_button.dart
+class CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final ButtonType type;
+  
+  const CustomButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.isLoading = false,
+    this.type = ButtonType.primary,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      style: _getButtonStyle(),
+      child: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Text(text),
+    );
+  }
+  
+  ButtonStyle _getButtonStyle() {
+    switch (type) {
+      case ButtonType.primary:
+        return ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+        );
+      case ButtonType.secondary:
+        return ElevatedButton.styleFrom(
+          backgroundColor: AppColors.secondary,
+          foregroundColor: AppColors.onSecondary,
+        );
+      case ButtonType.outlined:
+        return OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+        );
+    }
+  }
+}
+
+enum ButtonType { primary, secondary, outlined }
+```
+
+### 로딩 인디케이터
+
+```dart
+// lib/presentation/common/widgets/loading_indicator.dart
+class LoadingIndicator extends StatelessWidget {
+  final String? message;
+  
+  const LoadingIndicator({super.key, this.message});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          if (message != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              message!,
+              style: AppTypography.body2.copyWith(
+                color: AppColors.grey600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+```
+
+### 에러 뷰
+
+```dart
+// lib/presentation/common/widgets/error_view.dart
+class ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  
+  const ErrorView({
+    super.key,
+    required this.message,
+    this.onRetry,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: AppColors.error,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              '오류가 발생했습니다',
+              style: AppTypography.headline3,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              message,
+              style: AppTypography.body2,
+              textAlign: TextAlign.center,
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              CustomButton(
+                text: '다시 시도',
+                onPressed: onRetry,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## 5. 🎭 애니메이션 및 트랜지션
+
+### 애니메이션 상수
+
+```dart
+// lib/core/constants/animation_constants.dart
+class AnimationConstants {
+  static const Duration fast = Duration(milliseconds: 150);
+  static const Duration normal = Duration(milliseconds: 300);
+  static const Duration slow = Duration(milliseconds: 500);
+  
+  static const Curve defaultCurve = Curves.easeInOut;
+  static const Curve bounceCurve = Curves.elasticOut;
+}
+```
+
+### 페이지 전환 애니메이션
+
+```dart
+// lib/app/router.dart
+CustomTransitionPage _buildPageWithTransition(Widget child) {
+  return CustomTransitionPage(
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+    transitionDuration: AnimationConstants.normal,
+  );
+}
+```
+
+## 6. ♿ 접근성 (Accessibility)
+
+### 접근성 체크리스트
+- [ ] 모든 인터랙티브 요소에 적절한 크기 (최소 44x44)
+- [ ] 충분한 색상 대비 (WCAG AA 기준 4.5:1)
+- [ ] Semantics 위젯 활용
+- [ ] 스크린 리더 지원
+- [ ] 키보드 네비게이션 지원
+
+### Semantics 사용 예시
+
+```dart
+Semantics(
+  label: 'Branch 목록',
+  child: ListView.builder(
+    itemCount: branches.length,
+    itemBuilder: (context, index) {
+      return Semantics(
+        button: true,
+        label: 'Branch ${branches[index].name}',
+        child: BranchCard(branch: branches[index]),
+      );
+    },
+  ),
+)
+```
+
+## 7. 📋 UI/UX 체크리스트
+
+### 구현 전
+- [ ] 와이어프레임 또는 디자인 시안 확인
+- [ ] 반응형 레이아웃 계획
+- [ ] 인터랙션 플로우 정의
+- [ ] 에러 상태 및 엣지 케이스 고려
+
+### 구현 중
+- [ ] 디자인 시스템 준수 (색상, 타이포그래피, 간격)
+- [ ] 공통 컴포넌트 재사용
+- [ ] 로딩 상태 표시
+- [ ] 에러 상태 표시
+- [ ] 빈 상태 표시
+
+### 구현 후
+- [ ] 다양한 화면 크기에서 테스트
+- [ ] 인터랙션 자연스러움 확인
+- [ ] 접근성 검증
+- [ ] 성능 확인 (60fps 유지)
+
+## 8. 🚫 안티패턴
+
+### ❌ 하드코딩된 색상 및 크기
+```dart
+Container(
+  color: Color(0xFF6200EE), // 나쁜 예
+  padding: EdgeInsets.all(16), // 나쁜 예
+)
+```
+
+### ❌ 반응형 고려 없는 고정 크기
+```dart
+Container(
+  width: 800, // 모바일에서 문제 발생
+  child: content,
+)
+```
+
+### ✅ 올바른 패턴
+```dart
+Container(
+  color: AppColors.primary,
+  padding: const EdgeInsets.all(AppSpacing.md),
+  width: ResponsiveHelper.getResponsiveValue(
+    context,
+    mobile: double.infinity,
+    desktop: 800,
+  ),
+  child: content,
+)
+```
+
+## 9. 💡 베스트 프랙티스
+
+1. **디자인 시스템 준수**: 정의된 색상, 타이포그래피, 간격 사용
+2. **컴포넌트 재사용**: 공통 UI 요소는 위젯으로 분리
+3. **반응형 우선**: 모든 화면 크기 고려
+4. **상태 표시**: 로딩, 에러, 빈 상태 명확히 표시
+5. **접근성**: 모든 사용자가 사용 가능하도록 설계
+6. **성능**: 불필요한 리빌드 방지, 최적화된 애니메이션
+7. **일관성**: 전체 앱에서 동일한 패턴 유지
+
+---
+
+**핵심 원칙**: "일관되고, 반응적이며, 접근 가능한 UI를 만들어라"

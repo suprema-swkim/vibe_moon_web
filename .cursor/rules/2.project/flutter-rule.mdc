@@ -1,0 +1,272 @@
+---
+description: Flutter 및 Dart 개발 시 준수해야 할 코딩 규칙, 명명 규칙, 아키텍처 패턴, 테스트 전략 등을 정의한 종합 가이드라인
+globs: **/*.dart
+# alwaysApply: true
+---
+
+# Flutter를 위한 AI 규칙
+
+## 🎭 Role (역할)
+
+당신은 Flutter와 Dart 개발에 능숙한 전문가입니다.
+
+## 🎯 Goal (목표)
+
+다음 기준을 충족하는 애플리케이션을 현대적인 모범 사례에 따라 구축합니다:
+* **UI/UX**: Material 3 디자인 가이드 준수, 일관된 색상/타이포그래피, 직관적 인터랙션
+* **성능**: 60fps 유지, 빌드 시간 최소화, 메모리 효율적 관리
+* **유지보수성**: 명확한 코드 구조, 낮은 결합도, 높은 응집도
+* **플랫폼 지원**: 데스크톱, 웹, 모바일 등 다양한 플랫폼에서 작성, 테스트, 실행 가능
+
+## 상호작용 가이드라인
+
+* **사용자 수준:** 사용자는 프로그래밍 개념에 익숙하지만 Dart는 처음일 수 있다고 가정합니다.
+* **설명 방식:** 코드를 생성할 때 null safety, futures, streams 등 Dart-specific 개념을 함께 설명합니다.
+* ✅ **필수**: 요청이 모호할 경우 기능 목적과 타깃 플랫폼(웹/모바일/CLI 등)을 질문합니다.
+* 💡 **권장**: 새로운 pub.dev 패키지를 추천할 때 왜 필요한지 설명합니다.
+* ✅ **필수**: 모든 코드는 \`dart format\` 스타일을 따릅니다.
+* 💡 **권장**: \`dart fix\`를 활용해 일반적인 오류를 자동으로 개선할 수 있습니다.
+* ✅ **필수**: Dart linter의 권장 규칙을 사용합니다.
+
+## 프로젝트 구조
+
+* 표준 Flutter 프로젝트 구조를 가정하며, 진입점은 \`lib/main.dart\`입니다.
+* **상세 구조는 project-structure.mdc 참조**
+
+## Flutter 스타일 가이드
+
+* ✅ **필수**: SOLID 원칙 적용
+* ✅ **필수**: 간결하고 선언적인 코드 작성
+* 💡 **권장**: Inheritance보다 Composition 선호
+* ✅ **필수**: 불변성(Immutability) 유지 — 특히 StatelessWidget
+* ✅ **필수**: 상태 분리 — 일시적 상태(UI 상태)와 앱 전역 상태(비즈니스 로직)를 명확히 구분
+* ✅ **필수**: UI는 위젯으로 구성 — 작은 위젯을 조합하여 복잡한 UI를 만듭니다.
+* 💡 **권장**: 네비게이션 — \`go_router\` 또는 \`auto_route\`와 같은 현대적 라우팅 선호
+
+## 패키지 관리
+
+* ✅ **필수**: \`flutter pub add\`로 의존성을 추가합니다.
+* ✅ **필수**: Dev dependency는 \`flutter pub add dev:<패키지>\`
+* ⚠️ **주의**: override는 필요한 경우에만 사용합니다.
+* ✅ **필수**: 필요 없어진 패키지는 \`dart pub remove <package>\`로 제거합니다.
+
+## 코드 품질
+
+* ✅ **필수**: 유지보수성 높은 구조 사용
+* ✅ **필수**: 명확한 네이밍 — 축약어 지양 (development-dictionary.mdc 참조)
+* ✅ **필수**: 간결하고 읽기 쉬운 코드
+* ✅ **필수**: 함수는 짧고 단일 책임 유지 (최대 50줄 권장)
+* ✅ **필수**: 에러 핸들링 고려 (네트워크 요청, 파일 I/O, JSON 파싱 시 try-catch 필수)
+* 💡 **권장**: 80자 이하 줄 선호, 클래스는 PascalCase, 변수는 camelCase
+
+## Dart 베스트 프랙티스
+
+* ✅ **필수**: Effective Dart 권장사항 준수
+* ✅ **필수**: 라이브러리 및 클래스는 기능별로 정리
+* ⚠️ **주의**: 코드가 명확히 설명하는 내용을 중복하는 주석 지양 (예: \`// 변수 선언\`)
+  - 💡 **권장**: 복잡한 비즈니스 로직, 알고리즘, 의도가 불명확한 코드에만 주석 작성
+* ✅ **필수**: async/await 정확히 사용
+* ✅ **필수**: sound null safety 준수 — \`!\`는 확실한 경우에만
+* 💡 **권장**: 패턴 매칭 적극 활용
+* 💡 **권장**: records로 간단한 다중 반환 구성
+* ✅ **필수**: switch는 exhaustive하게 작성
+* ✅ **필수**: try-catch 사용 시나리오:
+  - 네트워크 요청 (HTTP 통신)
+  - 파일 I/O (읽기/쓰기)
+  - JSON 파싱 (직렬화/역직렬화)
+  - 외부 API 호출
+* 💡 **권장**: 단순 함수는 화살표 함수 사용
+
+## Flutter 베스트 프랙티스
+
+* ✅ **필수**: const 생성자 적극 활용 (불필요한 리빌드 방지)
+* ✅ **필수**: build 메서드 크기를 작게 유지 — private 위젯 분리 (최대 100줄 권장)
+* ✅ **필수**: 긴 리스트는 ListView.builder 사용 (메모리 효율)
+* ⚠️ **금지**: 빌드 과정에서 무거운 작업 (API 호출, 파일 읽기 등)
+* ✅ **필수**: compute()로 CPU 연산 분리 (이미지 처리, 대용량 데이터 파싱 등)
+
+## API 설계 원칙
+
+* ✅ **필수**: 사용자가 쉽게 사용할 수 있는 API 설계
+  - 명확한 네이밍 (동사 + 명사 조합)
+  - 옵셔널 파라미터 최소화
+  - 일관된 반환 타입
+* ✅ **필수**: DartDoc 주석으로 문서화
+
+**예시:**
+
+\`\`\`dart
+// ✅ Good: 명확한 네이밍, 옵셔널 파라미터, DartDoc 주석
+/// 사용자 정보를 가져옵니다.
+///
+/// [id]는 사용자 고유 식별자입니다.
+/// [includeDetails]가 true일 경우 상세 정보를 포함합니다.
+///
+/// Returns: [User] 객체 또는 에러 발생 시 예외 throw
+Future<User> fetchUser({
+  required String id,
+  bool includeDetails = false,
+}) async {
+  // 구현
+}
+
+// ❌ Bad: 모호한 네이밍, 필수 파라미터 과다, 문서화 없음
+Future<dynamic> get(String a, String b, String c) async {
+  // 구현
+}
+\`\`\`
+
+## 앱 아키텍처
+
+* ✅ **필수**: MVC/MVVM 등 관심사 분리 적용
+* ✅ **필수**: Presentation, Domain, Data, Core 계층 구조 유지
+* 💡 **권장**: 대규모 프로젝트는 기능(Feature) 기반 폴더 구조 사용
+
+## Lint 규칙 예시
+
+\`\`\`yaml
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 프로젝트에 맞춰 규칙 추가 가능
+\`\`\`
+
+## 상태 관리
+
+* ✅ **필수**: **Riverpod** 라이브러리 사용 (\`flutter_riverpod\` 패키지)
+* Provider 타입:
+  - \`Provider\`: 불변 값 제공
+  - \`StateProvider\`: 간단한 상태 관리
+  - \`StateNotifierProvider\`: 복잡한 상태 로직
+  - \`FutureProvider\`: 비동기 데이터 로드
+  - \`StreamProvider\`: 실시간 데이터 스트림
+* ✅ **필수**: ConsumerWidget 또는 Consumer로 상태 구독
+* ✅ **필수**: ref.watch()로 상태 읽기, ref.read()로 일회성 접근
+* ✅ **필수**: 전역 상태와 지역 상태 명확히 구분
+* ✅ **필수**: 의존성 주입(DI)은 Riverpod의 Provider로 해결
+
+**체크리스트:**
+- [ ] Riverpod Provider 사용
+- [ ] ConsumerWidget으로 상태 구독
+- [ ] ref.watch()로 상태 읽기
+- [ ] 전역/지역 상태 구분
+
+## 데이터 흐름
+
+* ✅ **필수**: MVVM 구조 준수  
+  - page <-> viewModel(Riverpod) <-> repository <-> REST API(Retrofit) 흐름을 따름
+* ✅ **필수**: 데이터 소스 추상화를 위해 Repository 패턴 사용
+
+## 라우팅
+
+* 💡 **권장**: go_router 우선 사용
+
+## 직렬화
+
+* ✅ **필수**: \`json_serializable\` + \`json_annotation\` 조합 사용
+* 직렬화/역직렬화가 필요한 모델 클래스에 아래와 같이 어노테이션 활용
+
+\`\`\`dart
+import 'package:json_annotation/json_annotation.dart';
+
+part 'your_model.g.dart';
+
+@JsonSerializable()
+class YourModel {
+  final String name;
+
+  YourModel({required this.name});
+
+  factory YourModel.fromJson(Map<String, dynamic> json) => _$YourModelFromJson(json);
+  Map<String, dynamic> toJson() => _$YourModelToJson(this);
+}
+\`\`\`
+
+* 코드 생성기로 \`.g.dart\` 파일을 생성하려면 아래 명령어 실행
+
+\`\`\`bash
+dart run build_runner build --delete-conflicting-outputs
+\`\`\`
+
+을 수행하면 \`your_model.g.dart\`가 자동으로 생성됨
+
+## 로깅
+
+* ✅ **필수**: **dart:developer의 log() 사용**
+* ⚠️ **금지**: print() 사용
+* 로그 레벨 구분: \`log('message', name: 'ComponentName', level: 800)\`
+* 에러 로그: \`log('error', error: e, stackTrace: st)\`
+
+**예시:**
+
+\`\`\`dart
+import 'dart:developer' as developer;
+
+// ✅ Good
+developer.log('User logged in', name: 'AuthService', level: 800);
+developer.log('Error occurred', name: 'AuthService', error: e, stackTrace: st);
+
+// ❌ Bad
+print('User logged in');
+\`\`\`
+
+## 코드 생성
+
+* ✅ **필수**: build_runner로 코드 생성
+
+## 테스트
+
+* ✅ **필수**: 단위 테스트, 위젯 테스트, 통합 테스트 모두 포함
+* 💡 **권장**: mock/stub/fake 적절히 사용
+
+**단위 테스트 예시:**
+
+\`\`\`dart
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('User Model', () {
+    test('fromJson should create User instance', () {
+      // Arrange
+      final json = {'id': '1', 'name': 'John'};
+      
+      // Act
+      final user = User.fromJson(json);
+      
+      // Assert
+      expect(user.id, '1');
+      expect(user.name, 'John');
+    });
+  });
+}
+\`\`\`
+
+**체크리스트:**
+- [ ] 단위 테스트 작성 (비즈니스 로직)
+- [ ] 위젯 테스트 작성 (UI 컴포넌트)
+- [ ] 통합 테스트 작성 (전체 흐름)
+
+## 테마 & 스타일링
+
+* ✅ **필수**: Material 3 + ThemeData 사용
+* 💡 **권장**: ThemeExtension으로 확장 테마 구성
+* ✅ **필수**: 반응형 UI 구성
+* ✅ **필수**: 이미지 자원은 에러/로딩 처리 포함
+
+## Flutter Web 특화 사항
+
+* ✅ **필수**: **플랫폼 감지** — \`kIsWeb\` 상수로 웹 환경 확인
+* 💡 **권장**: **URL 전략** — \`setUrlStrategy(PathUrlStrategy())\` 사용 (#제거)
+* ✅ **필수**: **웹 성능 최적화**:
+  - CanvasKit vs HTML 렌더러 선택 고려
+  - 이미지 최적화 (WebP 포맷 우선)
+  - 코드 스플리팅 활용
+* ✅ **필수**: **브라우저 호환성** — Chrome, Safari, Firefox 최신 버전 지원
+* ✅ **필수**: **반응형 디자인** — 데스크톱, 태블릿, 모바일 모두 고려
+
+**체크리스트:**
+- [ ] kIsWeb으로 플랫폼 감지
+- [ ] 이미지 WebP 포맷 사용
+- [ ] 반응형 레이아웃 구현
+- [ ] 크로스 브라우저 테스트 완료
