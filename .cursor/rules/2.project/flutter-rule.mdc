@@ -162,31 +162,57 @@ linter:
 ## 직렬화
 
 * ✅ **필수**: \`json_serializable\` + \`json_annotation\` 조합 사용
+* ✅ **필수**: 모든 모델 클래스는 nullable 필드 사용 (서버 응답의 유연성 확보)
+* ✅ **필수**: \`@JsonSerializable\` 어노테이션에 \`includeIfNull: false\`, \`explicitToJson: true\` 옵션 적용
 * 직렬화/역직렬화가 필요한 모델 클래스에 아래와 같이 어노테이션 활용
+
+**모델 클래스 작성 규칙:**
 
 \`\`\`dart
 import 'package:json_annotation/json_annotation.dart';
 
-part 'your_model.g.dart';
+part 'api_token_model.g.dart';
 
-@JsonSerializable()
-class YourModel {
-  final String name;
+@JsonSerializable(includeIfNull: false, explicitToJson: true)
+class ApiTokenModel {
+  int? apiTokenId;
+  String? apiToken;
+  int? apiTokenIssuedAt;
+  int? apiTokenExpiredAt;
 
-  YourModel({required this.name});
+  ApiTokenModel({
+    this.apiTokenId,
+    this.apiToken,
+    this.apiTokenIssuedAt,
+    this.apiTokenExpiredAt,
+  });
 
-  factory YourModel.fromJson(Map<String, dynamic> json) => _$YourModelFromJson(json);
-  Map<String, dynamic> toJson() => _$YourModelToJson(this);
+  factory ApiTokenModel.fromJson(Map<String, dynamic> json) => _$ApiTokenModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ApiTokenModelToJson(this);
 }
 \`\`\`
 
-* 코드 생성기로 \`.g.dart\` 파일을 생성하려면 아래 명령어 실행
+**\`@JsonSerializable\` 옵션 설명:**
+- \`includeIfNull: false\`: null 값은 JSON 직렬화 시 제외 (불필요한 데이터 전송 방지)
+- \`explicitToJson: true\`: 중첩된 객체도 명시적으로 \`toJson()\` 호출 (복잡한 모델 구조 지원)
+
+**코드 생성 명령어:**
 
 \`\`\`bash
 dart run build_runner build --delete-conflicting-outputs
 \`\`\`
 
-을 수행하면 \`your_model.g.dart\`가 자동으로 생성됨
+위 명령어를 실행하면 \`api_token_model.g.dart\` 파일이 자동으로 생성됩니다.
+
+**체크리스트:**
+- [ ] \`json_annotation\` 패키지 import
+- [ ] \`part '{모델명}.g.dart'\` 선언
+- [ ] \`@JsonSerializable(includeIfNull: false, explicitToJson: true)\` 어노테이션 추가
+- [ ] 모든 필드를 nullable로 선언 (int?, String? 등)
+- [ ] \`fromJson\` factory 생성자 구현
+- [ ] \`toJson\` 메서드 구현
+- [ ] \`dart run build_runner build --delete-conflicting-outputs\` 실행
 
 ## 로깅
 
